@@ -7,6 +7,16 @@
 - Jasmine Wicker
 
 # Organization of the Project
+| Feature | Programmer |
+| --- | --- |
+| ```cd``` |  |
+| ```exit``` |  |
+| ```path``` |  |
+| ```myhistory``` |  |
+| I/O Redirection |  |
+| Pipelining |  |
+| Signal Handling and Terminal Control |  |
+| ```alias``` |  |
 
 # Design Overview
 
