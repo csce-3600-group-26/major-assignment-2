@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,7 +6,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "built_in_cmd.h"
 #include "command.h"
+#include "macros.h"
 
 struct command *new_command()
 {
@@ -49,7 +52,20 @@ void execute_command(struct command *object)
 	// The process ID of the child process.
 	pid_t child = fork();
 	if (!child)
-		execvp(object->name, object->args);
+		if (!strcmp(object->name, "cd"))
+			cd(object);
+		else if (!strcmp(object->name, "path"))
+			path(object);
+		else if (!strcmp(object->name, "myhistory"))
+			myhistory(object);
+		else if (!strcmp(object->name, "alias"))
+			alias(object);
+		else
+		{
+			execvp(object->name, object->args);
+			if (errno)
+				fprintf(stderr, "%s: %s\n", SHELL_NAME, strerror(errno));
+		}
 	waitpid(child, NULL, 0);
 }
 
