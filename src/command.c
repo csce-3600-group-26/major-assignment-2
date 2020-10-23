@@ -49,24 +49,26 @@ void execute_command(struct command *object)
 {
 	if (!strcmp(object->name, "exit"))
 		exit(0);
-	// The process ID of the child process.
-	pid_t child = fork();
-	if (!child)
-		if (!strcmp(object->name, "cd"))
-			cd(object);
-		else if (!strcmp(object->name, "path"))
-			path(object);
-		else if (!strcmp(object->name, "myhistory"))
-			myhistory(object);
-		else if (!strcmp(object->name, "alias"))
-			alias(object);
-		else
+	if (!strcmp(object->name, "cd"))
+		cd(object);
+	else if (!strcmp(object->name, "path"))
+		path(object);
+	else if (!strcmp(object->name, "myhistory"))
+		myhistory(object);
+	else if (!strcmp(object->name, "alias"))
+		alias(object);
+	else
+	{
+		// The process ID of the child process.
+		pid_t child = fork();
+		if (!child)
 		{
 			execvp(object->name, object->args);
 			fprintf(stderr, "%s: %s\n", SHELL_NAME, strerror(errno));
 			exit(0);
 		}
-	waitpid(child, NULL, 0);
+		waitpid(child, NULL, 0);
+	}
 }
 
 void add_arg(struct command *object, char *arg)
