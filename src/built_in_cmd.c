@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "built_in_cmd.h"
 
 void init_data_structures()
