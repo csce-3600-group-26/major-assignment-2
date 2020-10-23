@@ -63,8 +63,8 @@ void execute_command(struct command *object)
 		else
 		{
 			execvp(object->name, object->args);
-			if (errno)
-				fprintf(stderr, "%s: %s\n", SHELL_NAME, strerror(errno));
+			fprintf(stderr, "%s: %s\n", SHELL_NAME, strerror(errno));
+			exit(0);
 		}
 	waitpid(child, NULL, 0);
 }
