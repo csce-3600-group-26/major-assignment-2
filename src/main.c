@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdio_ext.h>
+#include "built_in_cmd.h"
 #include "macros.h"
 #include "parse.h"
 #include "statement.h"
@@ -51,10 +52,12 @@ int main(int argc, char **argv)
 	{
 		case 0:
 			compile_regex();
+			init_data_structures();
 			interactive_mode();
 			break;
 		case 1:
 			compile_regex();
+			init_data_structures();
 			batch_mode(argv[1]);
 			break;
 		default:
