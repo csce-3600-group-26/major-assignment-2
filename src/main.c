@@ -2,6 +2,7 @@
 #include <stdio_ext.h>
 #include "macros.h"
 #include "parse.h"
+#include "statement.h"
 
 void interactive_mode()
 {
@@ -15,7 +16,8 @@ void interactive_mode()
 		// Clear input buffer
 		__fpurge(stdin);
 		// Parse input
-		parse(input);
+		struct statement *statement = parse(input);
+		execute_statement(statement);
 	}
 }
 
@@ -38,7 +40,8 @@ void batch_mode(char *file_path)
 		if (input[MAX_COMMAND_LENGTH - 2] != '\n' && input[MAX_COMMAND_LENGTH - 3] != '\n')
 			while (fgetc(file) != '\n');
 		// Parse input
-		parse(input);
+		struct statement *statement = parse(input);
+		execute_statement(statement);
 	}
 }
 

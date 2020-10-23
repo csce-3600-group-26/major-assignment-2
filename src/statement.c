@@ -21,3 +21,13 @@ void print_statement(struct statement *object, int statement_number)
 		print_statement(object->next, statement_number + 1);
 	}
 }
+
+void execute_statement(struct statement *object)
+{
+	if (object)
+	{
+		if (object->first)
+			execute_command(object->first);
+		execute_statement(object->next);
+	}
+}

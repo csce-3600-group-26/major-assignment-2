@@ -28,6 +28,9 @@ void delete_command(struct command *);
 // Prints a command object in a human-readable format.
 void print_command(struct command *object, int spaces);
 
+// Executes a command.
+void execute_command(struct command *object);
+
 // Adds a command-line argument to args.
 void add_arg(struct command *object, char *arg);
 

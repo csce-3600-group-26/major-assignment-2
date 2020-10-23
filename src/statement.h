@@ -20,4 +20,7 @@ void delete_statement(struct statement *);
 // Prints a statement object in a human-readable format.
 void print_statement(struct statement *object, int statement_number);
 
+// Executes all commands in a statement and in succeeding statements.
+void execute_statement(struct statement *object);
+
 #endif //MAJOR_ASSIGNMENT_2_STATEMENT_H

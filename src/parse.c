@@ -51,25 +51,32 @@ static void STATEMENT(char *input, size_t *i, struct statement *statement)
 
 static void COMMAND(char *input, size_t *i, struct statement *statement)
 {
+	char *command_name;
 	regmatch_t match;
 	if (!regexec(&built_in, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 	{
+		command_name = substring(input, i[0], i[0] + match.rm_eo);
 		statement->first = new_command();
-		statement->first->name = substring(input, i[0], i[0] + match.rm_eo);
+		statement->first->name = command_name;
+		add_arg(statement->first, command_name);
 		i[0] += match.rm_eo;
 		ARGS(input, i, statement->first);
 	}
 	else if (!regexec(&alias_cmd, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 	{
+		command_name = substring(input, i[0], i[0] + match.rm_eo);
 		statement->first = new_command();
-		statement->first->name = substring(input, i[0], i[0] + match.rm_eo);
+		statement->first->name = command_name;
+		add_arg(statement->first, command_name);
 		i[0] += match.rm_eo;
 		ALIAS_ARGS(input, i, statement->first);
 	}
 	else if (!regexec(&external, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 	{
+		command_name = substring(input, i[0], i[0] + match.rm_eo);
 		statement->first = new_command();
-		statement->first->name = substring(input, i[0], i[0] + match.rm_eo);
+		statement->first->name = command_name;
+		add_arg(statement->first, command_name);
 		i[0] += match.rm_eo;
 		EXT_ARGS(input, i, statement->first);
 	}
