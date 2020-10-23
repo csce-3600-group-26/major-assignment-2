@@ -9,7 +9,7 @@ void alias(struct command *cmd)
 {
 	printf("This is the alias command.\n");
 	print_command(cmd, 0);
-	if (cmd->num_args > 0)
+	if (cmd->num_args > 1)
 	{
 		struct alias *alias = malloc(sizeof(struct alias));
 		alias->name = NULL;
@@ -46,8 +46,9 @@ void alias(struct command *cmd)
 				i++;
 		}
 		alias_add(alias);
+		return;
 	}
-
+	alias_print();
 }
 
 void alias_add(struct alias *alias)
@@ -59,4 +60,11 @@ void alias_add(struct alias *alias)
 	memcpy(new_aliases, aliases, sizeof(struct alias *) * (aliases_size - 1));
 	free(aliases);
 	aliases = new_aliases;
+}
+
+void alias_print()
+{
+	printf("[%lu alias%s]\n", aliases_size, aliases_size == 1 ? "" : "es");
+	for (size_t i = 0; aliases[i]; i++)
+		printf("alias %s='%s'\n", aliases[i]->name, aliases[i]->command);
 }
