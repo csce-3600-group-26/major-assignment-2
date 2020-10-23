@@ -51,6 +51,18 @@ struct alias **aliases;
 // The number of alias objects in aliases.
 size_t aliases_size;
 
+// Adds an alias. If the alias name is already taken, that alias will be overwritten.
+void alias_add(struct alias *alias);
+
+// Removes an alias.
+void alias_remove(char *alias_name);
+
+// Removes all aliases.
+void alias_clear();
+
+// Prints all aliases.
+void alias_print();
+
 /* -------------------------------------- */
 
 // Initializes all data structures for built-in commands.
