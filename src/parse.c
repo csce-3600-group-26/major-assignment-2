@@ -112,13 +112,18 @@ static void ALIAS_ARGS(char *input, size_t *i, struct command *cmd)
 	regmatch_t match;
 	if (!regexec(&whitespace, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 	{
-		i[0] += match.rm_eo;
+		size_t whitespace_rm_eo = match.rm_eo;
+		i[0] += whitespace_rm_eo;
 		if (!regexec(&alias, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 		{
 			add_arg(cmd, substring(input, i[0], i[0] + match.rm_eo));
 			i[0] += match.rm_eo;
 		}
-		else ARGS(input, i, cmd);
+		else
+		{
+			i[0] -= whitespace_rm_eo;
+			ARGS(input, i, cmd);
+		}
 	}
 }
 
