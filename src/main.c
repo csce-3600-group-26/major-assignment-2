@@ -1,13 +1,7 @@
 #include <stdio.h>
 #include <stdio_ext.h>
-
-#define SHELL_NAME "newshell"
-#define MAX_COMMAND_LENGTH 512
-
-void parse(char *input)
-{
-
-}
+#include "macros.h"
+#include "parse.h"
 
 void interactive_mode()
 {
@@ -53,9 +47,11 @@ int main(int argc, char **argv)
 	switch (argc - 1)
 	{
 		case 0:
+			compile_regex();
 			interactive_mode();
 			break;
 		case 1:
+			compile_regex();
 			batch_mode(argv[1]);
 			break;
 		default:
