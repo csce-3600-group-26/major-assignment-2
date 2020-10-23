@@ -246,7 +246,6 @@ struct statement *parse(char *input)
 		current->next = new_statement();
 		current = current->next;
 	}
-	print_statement(first, 1);
 	// Free memory
 	free(i);
 	return first;
