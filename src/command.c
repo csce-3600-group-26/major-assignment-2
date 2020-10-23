@@ -9,6 +9,7 @@
 #include "built_in_cmd.h"
 #include "command.h"
 #include "macros.h"
+#include "parse.h"
 
 struct command *new_command()
 {
@@ -50,25 +51,41 @@ void execute_command(struct command *object)
 	if (!strcmp(object->name, "exit"))
 		exit(0);
 	if (!strcmp(object->name, "cd"))
-		cd(object);
-	else if (!strcmp(object->name, "path"))
-		path(object);
-	else if (!strcmp(object->name, "myhistory"))
-		myhistory(object);
-	else if (!strcmp(object->name, "alias"))
-		alias(object);
-	else
 	{
-		// The process ID of the child process.
-		pid_t child = fork();
-		if (!child)
-		{
-			execvp(object->name, object->args);
-			fprintf(stderr, "%s: %s\n", SHELL_NAME, strerror(errno));
-			exit(0);
-		}
-		waitpid(child, NULL, 0);
+		cd(object);
+		return;
 	}
+	else if (!strcmp(object->name, "path"))
+	{
+		path(object);
+		return;
+	}
+	else if (!strcmp(object->name, "myhistory"))
+	{
+		myhistory(object);
+		return;
+	}
+	else if (!strcmp(object->name, "alias"))
+	{
+		alias(object);
+		return;
+	}
+	// Find a matching alias and execute it.
+	for (size_t i = 0; aliases[i]; i++)
+		if (!strcmp(object->name, aliases[i]->name))
+		{
+			execute_statement(parse(aliases[i]->command));
+			return;
+		}
+	// The process ID of the child process.
+	pid_t child = fork();
+	if (!child)
+	{
+		execvp(object->name, object->args);
+		fprintf(stderr, "%s: %s\n", SHELL_NAME, strerror(errno));
+		exit(0);
+	}
+	waitpid(child, NULL, 0);
 }
 
 void add_arg(struct command *object, char *arg)
