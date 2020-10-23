@@ -9,14 +9,14 @@
 # Organization of the Project
 | Feature | Programmer |
 | --- | --- |
-| ```cd``` |  |
-| ```exit``` |  |
-| ```path``` |  |
-| ```myhistory``` |  |
+| ```cd``` | Jasmine Wicker |
+| ```exit``` | Richard Lin |
+| ```path``` | Ha Nguyen |
+| ```myhistory``` | Brandon Dumas |
 | I/O Redirection |  |
 | Pipelining |  |
 | Signal Handling and Terminal Control |  |
-| ```alias``` |  |
+| ```alias``` | Richard Lin |
 
 # Design Overview
 
