@@ -29,7 +29,7 @@ struct command **history;
 size_t history_size;
 
 // Adds a command object to history.
-void history_add(struct command *);
+void history_add(struct command *cmd);
 
 /* -----------------alias---------------- */
 

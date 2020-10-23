@@ -6,7 +6,7 @@ void myhistory(struct command *cmd)
 	printf("This is the myhistory command.\n");
 }
 
-void history_add(struct command *)
+void history_add(struct command *cmd)
 {
     
 }
