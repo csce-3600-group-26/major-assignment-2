@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "built_in_cmd.h"
-#include "macros.h"
 #include "string_util.h"
 
 void alias(struct command *cmd)
@@ -20,6 +19,7 @@ void alias(struct command *cmd)
 		if (cmd->args[1][0] == '-')
 		{
 			if (cmd->args[1][1])
+			{
 				if (cmd->args[1][1] == 'c' && !cmd->args[1][2])
 				{
 					alias_clear();
@@ -27,8 +27,10 @@ void alias(struct command *cmd)
 				}
 				else if (cmd->args[1][1] == 'r' && !cmd->args[1][2])
 				{
+					alias_remove(cmd->args[2]);
 					return;
 				}
+			}
 		}
 		else
 		{
@@ -69,7 +71,7 @@ void alias(struct command *cmd)
 			}
 		}
 	}
-	fprintf(stderr, "%s: alias: Invalid arguments.\n", SHELL_NAME);
+	fprintf(stderr, "alias: Invalid arguments.\n");
 }
 
 void alias_add(struct alias *alias)
@@ -79,6 +81,25 @@ void alias_add(struct alias *alias)
 	new_aliases[aliases_size] = NULL;
 	new_aliases[aliases_size - 1] = alias;
 	memcpy(new_aliases, aliases, sizeof(struct alias *) * (aliases_size - 1));
+	free(aliases);
+	aliases = new_aliases;
+}
+
+void alias_remove(char *alias_name)
+{
+	size_t i = 0;
+	for (; aliases[i]; i++)
+		if (!strcmp(aliases[i]->name, alias_name))
+			break;
+	if (!aliases[i])
+	{
+		fprintf(stderr, "alias: Alias does not exist.\n");
+		return;
+	}
+	aliases_size--;
+	struct alias **new_aliases = malloc(sizeof(struct alias *) * (aliases_size + 1));
+	memcpy(new_aliases, aliases, sizeof(struct alias *) * i);
+	memcpy(&new_aliases[i], &aliases[i + 1], sizeof(struct alias *) * (aliases_size - i + 1));
 	free(aliases);
 	aliases = new_aliases;
 }
