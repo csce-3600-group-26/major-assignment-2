@@ -8,7 +8,15 @@ void init_data_structures()
 	// path
 
 	// myhistory
-	history = malloc(sizeof(struct command *));
+	history = malloc(20*sizeof(struct command *));
+	history[0] = NULL;
+	history[0] = NULL;
+	history[0] = NULL;
+	history[0] = NULL;
+	history[0] = NULL;
+	history[0] = NULL;
+	history[0] = NULL;
+	history[0] = NULL;
 	history[0] = NULL;
 	history_size = 0;
 	// alias
