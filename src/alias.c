@@ -34,9 +34,7 @@ void alias(struct command *cmd)
 		}
 		else
 		{
-			struct alias *alias = malloc(sizeof(struct alias));
-			alias->name = NULL;
-			alias->command = NULL;
+			struct alias *alias = new_alias();
 			size_t i = 0, start = 0;
 			while (cmd->args[1][i])
 			{
@@ -100,12 +98,16 @@ void alias_remove(char *alias_name)
 	struct alias **new_aliases = malloc(sizeof(struct alias *) * (aliases_size + 1));
 	memcpy(new_aliases, aliases, sizeof(struct alias *) * i);
 	memcpy(&new_aliases[i], &aliases[i + 1], sizeof(struct alias *) * (aliases_size - i + 1));
+	delete_alias(aliases[i]);
 	free(aliases);
 	aliases = new_aliases;
 }
 
 void alias_clear()
 {
+	for (size_t i = 0; aliases[i]; i++)
+		delete_alias(aliases[i]);
+	free(aliases);
 	aliases = malloc(sizeof(struct alias *));
 	aliases[0] = NULL;
 	aliases_size = 0;
@@ -116,4 +118,19 @@ void alias_print()
 	printf("[%lu alias%s]\n", aliases_size, aliases_size == 1 ? "" : "es");
 	for (size_t i = 0; aliases[i]; i++)
 		printf("alias %s='%s'\n", aliases[i]->name, aliases[i]->command);
+}
+
+struct alias *new_alias()
+{
+	struct alias *alias = malloc(sizeof(struct alias));
+	alias->name = NULL;
+	alias->command = NULL;
+	return alias;
+}
+
+void delete_alias(struct alias *object)
+{
+	free(object->name);
+	free(object->command);
+	free(object);
 }

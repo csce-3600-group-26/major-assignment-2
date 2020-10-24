@@ -45,6 +45,12 @@ struct alias
 	char *command;
 };
 
+// Instantiates an alias object.
+struct alias *new_alias();
+
+// Frees the memory associated with an alias object and its members.
+void delete_alias(struct alias *object);
+
 // A null-terminated array of alias objects.
 struct alias **aliases;
 
