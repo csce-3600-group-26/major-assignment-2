@@ -74,6 +74,15 @@ void alias(struct command *cmd)
 
 void alias_add(struct alias *alias)
 {
+	for (size_t i = 0; aliases[i]; i++)
+		if (!strcmp(aliases[i]->name, alias->name))
+		{
+			free(aliases[i]->command);
+			aliases[i]->command = alias->command;
+			free(alias->name);
+			free(alias);
+			return;
+		}
 	aliases_size++;
 	struct alias **new_aliases = malloc(sizeof(struct alias *) * (aliases_size + 1));
 	new_aliases[aliases_size] = NULL;
