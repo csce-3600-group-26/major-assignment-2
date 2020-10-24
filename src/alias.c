@@ -14,23 +14,12 @@ void alias(struct command *cmd)
 		alias_print();
 		return;
 	}
-	if (cmd->num_args > 1)
+	else if (cmd->num_args == 2)
 	{
-		if (cmd->args[1][0] == '-')
+		if (!strcmp(cmd->args[1], "-c"))
 		{
-			if (cmd->args[1][1])
-			{
-				if (cmd->args[1][1] == 'c' && !cmd->args[1][2])
-				{
-					alias_clear();
-					return;
-				}
-				else if (cmd->args[1][1] == 'r' && !cmd->args[1][2])
-				{
-					alias_remove(cmd->args[2]);
-					return;
-				}
-			}
+			alias_clear();
+			return;
 		}
 		else
 		{
@@ -69,6 +58,14 @@ void alias(struct command *cmd)
 			}
 		}
 	}
+	else if (cmd->num_args == 3)
+	{
+		if (!strcmp(cmd->args[1], "-r"))
+		{
+			alias_remove(cmd->args[2]);
+			return;
+		}
+	}
 	fprintf(stderr, "alias: Invalid arguments.\n");
 }
 
@@ -100,7 +97,7 @@ void alias_remove(char *alias_name)
 			break;
 	if (!aliases[i])
 	{
-		fprintf(stderr, "alias: The alias does not exist.\n");
+		fprintf(stderr, "alias: The alias cannot be removed because it does not exist.\n");
 		return;
 	}
 	aliases_size--;
