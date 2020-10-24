@@ -93,7 +93,7 @@ void alias_remove(char *alias_name)
 			break;
 	if (!aliases[i])
 	{
-		fprintf(stderr, "alias: Alias does not exist.\n");
+		fprintf(stderr, "alias: The alias does not exist.\n");
 		return;
 	}
 	aliases_size--;
