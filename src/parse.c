@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "macros.h"
+#include <string.h>
 #include "parse.h"
 #include "string_util.h"
 
@@ -45,7 +45,7 @@ static void STATEMENT(char *input, size_t *i, struct statement *statement)
 	else
 	{
 		printf("[Syntax Error] Expecting semicolon or newline.\n");
-		i[0] = MAX_COMMAND_LENGTH - 1;
+		i[0] = strlen(input);
 	}
 }
 
@@ -83,7 +83,7 @@ static void COMMAND(char *input, size_t *i, struct statement *statement)
 	else
 	{
 		printf("[Syntax Error] Expecting command.\n");
-		i[0] = MAX_COMMAND_LENGTH - 1;
+		i[0] = strlen(input);
 	}
 }
 
@@ -102,7 +102,7 @@ static void ARGS(char *input, size_t *i, struct command *cmd)
 		else
 		{
 			printf("[Syntax Error] Expecting argument for built-in command.\n");
-			i[0] = MAX_COMMAND_LENGTH - 1;
+			i[0] = strlen(input);
 		}
 	}
 }
@@ -158,13 +158,13 @@ static void EXT_ARGS(char *input, size_t *i, struct command *cmd)
 				else
 				{
 					printf("[Syntax Error] Expecting file for redirection.\n");
-					i[0] = MAX_COMMAND_LENGTH - 1;
+					i[0] = strlen(input);
 				}
 			}
 			else
 			{
 				printf("[Syntax Error] Expecting whitespace.\n");
-				i[0] = MAX_COMMAND_LENGTH - 1;
+				i[0] = strlen(input);
 			}
 		}
 		else PIPE(input, i, cmd);
@@ -190,13 +190,13 @@ static void PIPE(char *input, size_t *i, struct command *cmd)
 			else
 			{
 				printf("[Syntax Error] Expecting external command for pipe.\n");
-				i[0] = MAX_COMMAND_LENGTH - 1;
+				i[0] = strlen(input);
 			}
 		}
 		else
 		{
 			printf("[Syntax Error] Expecting whitespace.\n");
-			i[0] = MAX_COMMAND_LENGTH - 1;
+			i[0] = strlen(input);
 		}
 	}
 }
