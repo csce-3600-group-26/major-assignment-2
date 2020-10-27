@@ -24,38 +24,11 @@ void alias(struct command *cmd)
 		else
 		{
 			struct alias *alias = new_alias();
-			size_t i = 0, start = 0;
-			while (cmd->args[1][i])
-			{
-				if (cmd->args[1][i] == '=')
-				{
-					alias->name = substring(cmd->args[1], 0, i);
-					break;
-				}
-				else
-					i++;
-			}
-			while (cmd->args[1][i])
-			{
-				if (cmd->args[1][i] == '\'')
-				{
-					start = ++i;
-					break;
-				}
-				else
-					i++;
-			}
-			while (cmd->args[1][i])
-			{
-				if (cmd->args[1][i] == '\'')
-				{
-					alias->command = substring(cmd->args[1], start, i);
-					alias_add(alias);
-					return;
-				}
-				else
-					i++;
-			}
+			size_t index_of_assignment_operator = strchr(cmd->args[1], '=') - cmd->args[1];
+			alias->name = substring(cmd->args[1], 0, index_of_assignment_operator);
+			alias->command = substring(cmd->args[1], index_of_assignment_operator + 2, strlen(cmd->args[1]) - 1);
+			alias_add(alias);
+			return;
 		}
 	}
 	else if (cmd->num_args == 3)
