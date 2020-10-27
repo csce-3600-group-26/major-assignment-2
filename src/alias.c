@@ -47,10 +47,8 @@ void alias_add(struct alias *alias)
 	for (size_t i = 0; aliases[i]; i++)
 		if (!strcmp(aliases[i]->name, alias->name))
 		{
-			free(aliases[i]->command);
-			aliases[i]->command = alias->command;
-			free(alias->name);
-			free(alias);
+			delete_alias(aliases[i]);
+			aliases[i] = alias;
 			return;
 		}
 	aliases_size++;
