@@ -1,8 +1,10 @@
+#include <regex.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "built_in_cmd.h"
+#include "parse.h"
 #include "string_util.h"
 
 void alias(struct command *cmd)
@@ -16,12 +18,13 @@ void alias(struct command *cmd)
 	}
 	else if (cmd->num_args == 2)
 	{
+		regmatch_t match;
 		if (!strcmp(cmd->args[1], "-c"))
 		{
 			alias_clear();
 			return;
 		}
-		else
+		else if (!regexec(&regex_alias, cmd->args[1], 1, &match, 0) && match.rm_so == 0)
 		{
 			struct alias *alias = new_alias();
 			size_t index_of_assignment_operator = strchr(cmd->args[1], '=') - cmd->args[1];
