@@ -8,46 +8,48 @@
 
 // Declarations
 
-static void STATEMENT(char *, size_t *, struct statement *);
+static int STATEMENT(char *, size_t *, struct statement *);
 
-static void COMMAND(char *, size_t *, struct statement *);
+static int COMMAND(char *, size_t *, struct statement *);
 
-static void ARGS(char *, size_t *, struct command *);
+static int ARGS(char *, size_t *, struct command *);
 
-static void ALIAS_ARGS(char *, size_t *, struct command *);
+static int ALIAS_ARGS(char *, size_t *, struct command *);
 
-static void EXT_ARGS(char *, size_t *, struct command *);
+static int EXT_ARGS(char *, size_t *, struct command *);
 
-static void PIPE(char *, size_t *, struct command *);
+static int PIPE(char *, size_t *, struct command *);
 
 // Definitions
 
-static void STATEMENT(char *input, size_t *i, struct statement *statement)
+static int STATEMENT(char *input, size_t *i, struct statement *statement)
 {
+	int error_code = 0;
 	regmatch_t match;
 	if (!regexec(&regex_whitespace, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 		i[0] += match.rm_eo;
 	if (!regexec(&regex_end, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 	{
 		i[0] += match.rm_eo;
-		return;
+		return error_code;
 	}
-	else COMMAND(input, i, statement);
+	else error_code = COMMAND(input, i, statement);
 	if (!regexec(&regex_whitespace, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 		i[0] += match.rm_eo;
 	if (!regexec(&regex_end, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 	{
 		i[0] += match.rm_eo;
-		return;
+		return error_code;
 	}
 	else
 	{
 		printf("[Syntax Error] Expecting semicolon or newline.\n");
 		i[0] = strlen(input);
+		return 1;
 	}
 }
 
-static void COMMAND(char *input, size_t *i, struct statement *statement)
+static int COMMAND(char *input, size_t *i, struct statement *statement)
 {
 	char *command_name;
 	regmatch_t match;
@@ -58,7 +60,7 @@ static void COMMAND(char *input, size_t *i, struct statement *statement)
 		statement->first->name = command_name;
 		add_arg(statement->first, command_name);
 		i[0] += match.rm_eo;
-		ARGS(input, i, statement->first);
+		return ARGS(input, i, statement->first);
 	}
 	else if (!regexec(&regex_alias_cmd, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 	{
@@ -67,7 +69,7 @@ static void COMMAND(char *input, size_t *i, struct statement *statement)
 		statement->first->name = command_name;
 		add_arg(statement->first, command_name);
 		i[0] += match.rm_eo;
-		ALIAS_ARGS(input, i, statement->first);
+		return ALIAS_ARGS(input, i, statement->first);
 	}
 	else if (!regexec(&regex_external, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 	{
@@ -76,16 +78,17 @@ static void COMMAND(char *input, size_t *i, struct statement *statement)
 		statement->first->name = command_name;
 		add_arg(statement->first, command_name);
 		i[0] += match.rm_eo;
-		EXT_ARGS(input, i, statement->first);
+		return EXT_ARGS(input, i, statement->first);
 	}
 	else
 	{
 		printf("[Syntax Error] Expecting command.\n");
 		i[0] = strlen(input);
+		return 2;
 	}
 }
 
-static void ARGS(char *input, size_t *i, struct command *cmd)
+static int ARGS(char *input, size_t *i, struct command *cmd)
 {
 	regmatch_t match;
 	if (!regexec(&regex_whitespace, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
@@ -95,17 +98,19 @@ static void ARGS(char *input, size_t *i, struct command *cmd)
 		{
 			add_arg(cmd, substring(input, i[0], i[0] + match.rm_eo));
 			i[0] += match.rm_eo;
-			ARGS(input, i, cmd);
+			return ARGS(input, i, cmd);
 		}
 		else
 		{
 			printf("[Syntax Error] Expecting argument for built-in command.\n");
 			i[0] = strlen(input);
+			return 3;
 		}
 	}
+	return 0;
 }
 
-static void ALIAS_ARGS(char *input, size_t *i, struct command *cmd)
+static int ALIAS_ARGS(char *input, size_t *i, struct command *cmd)
 {
 	regmatch_t match;
 	if (!regexec(&regex_whitespace, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
@@ -120,12 +125,13 @@ static void ALIAS_ARGS(char *input, size_t *i, struct command *cmd)
 		else
 		{
 			i[0] -= whitespace_rm_eo;
-			ARGS(input, i, cmd);
+			return ARGS(input, i, cmd);
 		}
 	}
+	return 0;
 }
 
-static void EXT_ARGS(char *input, size_t *i, struct command *cmd)
+static int EXT_ARGS(char *input, size_t *i, struct command *cmd)
 {
 	regmatch_t match;
 	if (!regexec(&regex_whitespace, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
@@ -135,7 +141,7 @@ static void EXT_ARGS(char *input, size_t *i, struct command *cmd)
 		{
 			add_arg(cmd, substring(input, i[0], i[0] + match.rm_eo));
 			i[0] += match.rm_eo;
-			EXT_ARGS(input, i, cmd);
+			return EXT_ARGS(input, i, cmd);
 		}
 		else if (!regexec(&regex_redirection, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 		{
@@ -151,25 +157,28 @@ static void EXT_ARGS(char *input, size_t *i, struct command *cmd)
 					else
 						cmd->output = substring(input, i[0], i[0] + match.rm_eo);
 					i[0] += match.rm_eo;
-					EXT_ARGS(input, i, cmd);
+					return EXT_ARGS(input, i, cmd);
 				}
 				else
 				{
 					printf("[Syntax Error] Expecting file for redirection.\n");
 					i[0] = strlen(input);
+					return 5;
 				}
 			}
 			else
 			{
 				printf("[Syntax Error] Expecting whitespace.\n");
 				i[0] = strlen(input);
+				return 4;
 			}
 		}
-		else PIPE(input, i, cmd);
+		else return PIPE(input, i, cmd);
 	}
+	return 0;
 }
 
-static void PIPE(char *input, size_t *i, struct command *cmd)
+static int PIPE(char *input, size_t *i, struct command *cmd)
 {
 	regmatch_t match;
 	if (!regexec(&regex_pipe, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
@@ -183,20 +192,23 @@ static void PIPE(char *input, size_t *i, struct command *cmd)
 				cmd->pipe = new_command();
 				cmd->pipe->name = substring(input, i[0], i[0] + match.rm_eo);
 				i[0] += match.rm_eo;
-				EXT_ARGS(input, i, cmd->pipe);
+				return EXT_ARGS(input, i, cmd->pipe);
 			}
 			else
 			{
 				printf("[Syntax Error] Expecting external command for pipe.\n");
 				i[0] = strlen(input);
+				return 7;
 			}
 		}
 		else
 		{
 			printf("[Syntax Error] Expecting whitespace.\n");
 			i[0] = strlen(input);
+			return 6;
 		}
 	}
+	return 0;
 }
 
 void compile_regex()
