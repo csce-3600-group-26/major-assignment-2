@@ -255,7 +255,12 @@ struct statement *parse(char *input)
 	// Parse the input until null char.
 	while (input[i[0]])
 	{
-		STATEMENT(input, i, current);
+		if (STATEMENT(input, i, current))
+		{
+			delete_statement(first);
+			first = NULL;
+			break;
+		}
 		if (!input[i[0]])
 			break;
 		current->next = new_statement();
