@@ -58,7 +58,7 @@ static int COMMAND(char *input, size_t *i, struct statement *statement)
 		command_name = substring(input, i[0], i[0] + match.rm_eo);
 		statement->first = new_command();
 		statement->first->name = command_name;
-		add_arg(statement->first, command_name);
+		add_arg(statement->first, strdup(command_name));
 		i[0] += match.rm_eo;
 		return ARGS(input, i, statement->first);
 	}
@@ -67,7 +67,7 @@ static int COMMAND(char *input, size_t *i, struct statement *statement)
 		command_name = substring(input, i[0], i[0] + match.rm_eo);
 		statement->first = new_command();
 		statement->first->name = command_name;
-		add_arg(statement->first, command_name);
+		add_arg(statement->first, strdup(command_name));
 		i[0] += match.rm_eo;
 		return ALIAS_ARGS(input, i, statement->first);
 	}
@@ -76,7 +76,7 @@ static int COMMAND(char *input, size_t *i, struct statement *statement)
 		command_name = substring(input, i[0], i[0] + match.rm_eo);
 		statement->first = new_command();
 		statement->first->name = command_name;
-		add_arg(statement->first, command_name);
+		add_arg(statement->first, strdup(command_name));
 		i[0] += match.rm_eo;
 		return EXT_ARGS(input, i, statement->first);
 	}
