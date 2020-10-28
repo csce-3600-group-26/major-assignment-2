@@ -15,7 +15,7 @@ struct statement
 struct statement *new_statement();
 
 // Frees the memory associated with a statement object and its members.
-void delete_statement(struct statement *);
+void delete_statement(struct statement *object);
 
 // Prints a statement object in a human-readable format.
 void print_statement(struct statement *object, int statement_number);

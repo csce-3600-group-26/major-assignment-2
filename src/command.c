@@ -24,6 +24,21 @@ struct command *new_command()
 	return object;
 }
 
+void delete_command(struct command *object)
+{
+	if (object)
+	{
+		free(object->name);
+		for (size_t i = 0; object->args[i]; i++)
+			free(object->args[i]);
+		free(object->args);
+		free(object->input);
+		free(object->output);
+		delete_command(object->pipe);
+		free(object);
+	}
+}
+
 void print_command(struct command *object, int spaces)
 {
 	if (object->name)

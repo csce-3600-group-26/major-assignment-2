@@ -23,7 +23,7 @@ struct command
 struct command *new_command();
 
 // Frees the memory associated with a command object and its members.
-void delete_command(struct command *);
+void delete_command(struct command *object);
 
 // Prints a command object in a human-readable format.
 void print_command(struct command *object, int spaces);
