@@ -11,6 +11,55 @@
 #include "macros.h"
 #include "parse.h"
 
+// An array of strings, each representing an alias that has already been expanded.
+static char **previous_aliases = NULL;
+
+// The number of aliases in previous_aliases.
+static size_t previous_aliases_size = 0;
+
+// Adds an alias to previous_aliases.
+static void previous_aliases_add(char *alias)
+{
+	if (previous_aliases)
+	{
+		previous_aliases_size++;
+		char **new_previous_aliases = malloc(sizeof(char *) * (previous_aliases_size + 1));
+		new_previous_aliases[previous_aliases_size] = NULL;
+		new_previous_aliases[previous_aliases_size - 1] = alias;
+		memcpy(new_previous_aliases, previous_aliases, sizeof(char *) * (previous_aliases_size - 1));
+		free(previous_aliases);
+		previous_aliases = new_previous_aliases;
+	}
+	else
+	{
+		previous_aliases_size = 1;
+		previous_aliases = malloc(sizeof(char *) * 2);
+		previous_aliases[1] = NULL;
+		previous_aliases[0] = alias;
+	}
+}
+
+// Removes all aliases in previous_aliases.
+static void previous_aliases_clear()
+{
+	if (previous_aliases)
+	{
+		previous_aliases_size = 0;
+		free(previous_aliases);
+		previous_aliases = NULL;
+	}
+}
+
+// Returns true if previous_aliases contains the specified alias.
+static int previous_aliases_contains(char *alias)
+{
+	if (previous_aliases)
+		for (size_t i = 0; previous_aliases[i]; i++)
+			if (!strcmp(alias, previous_aliases[i]))
+				return 1;
+	return 0;
+}
+
 struct command *new_command()
 {
 	struct command *object = malloc(sizeof(struct command));
@@ -86,12 +135,60 @@ void execute_command(struct command *object)
 		return;
 	}
 	// Find a matching alias and execute it.
-	for (size_t i = 0; aliases[i]; i++)
-		if (!strcmp(object->name, aliases[i]->name))
-		{
-			execute_statement(parse(aliases[i]->command));
-			return;
-		}
+	if (!previous_aliases_contains(object->name))
+		for (size_t i = 0; aliases[i]; i++)
+			if (!strcmp(object->name, aliases[i]->name))
+			{
+				// Parse the alias.
+				struct statement *alias_statement = parse(aliases[i]->command);
+				// Return if the alias's statement is invalid.
+				if (!alias_statement)
+					return;
+				// Keep track of aliases that have already been expanded.
+				previous_aliases_add(aliases[i]->name);
+				// Get the last statement.
+				struct statement *last_statement = alias_statement;
+				while (last_statement->next)
+					last_statement = last_statement->next;
+				// Get the last command.
+				struct command *last_command = NULL;
+				if (last_statement->first)
+				{
+					last_command = last_statement->first;
+					while (last_command->pipe)
+						last_command = last_command->pipe;
+				}
+				else if (object->num_args >= 2)
+				{
+					last_statement->first = new_command();
+					last_command = last_statement->first;
+					last_command->name = strdup(object->args[1]);
+				}
+				// Copy all arguments from the current command to the alias's last command.
+				if (last_command)
+				{
+					for (size_t j = 1; j < object->num_args; j++)
+						add_arg(last_command, strdup(object->args[j]));
+					if (object->input)
+					{
+						free(last_command->input);
+						last_command->input = strdup(object->input);
+					}
+					if (object->output)
+					{
+						free(last_command->output);
+						last_command->output = strdup(object->output);
+					}
+					if (object->pipe)
+						last_command->pipe = object->pipe;
+				}
+				execute_statement(alias_statement);
+				if (last_command)
+					last_command->pipe = NULL;
+				delete_statement(alias_statement);
+				previous_aliases_clear();
+				return;
+			}
 	// The process ID of the child process.
 	pid_t child = fork();
 	if (!child)
