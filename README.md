@@ -15,7 +15,7 @@
 | ```myhistory``` | Brandon Dumas |
 | I/O Redirection |  |
 | Pipelining |  |
-| Signal Handling and Terminal Control |  |
+| Signal Handling and Terminal Control | Richard Lin |
 | ```alias``` | Richard Lin |
 
 # Design Overview
