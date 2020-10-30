@@ -1,9 +1,9 @@
 #include <errno.h>
+#include <signal.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include "built_in_cmd.h"
@@ -193,11 +193,19 @@ void execute_command(struct command *object)
 	pid_t child = fork();
 	if (!child)
 	{
+		setpgid(getpid(), 0);
+		tcsetpgrp(STDIN_FILENO, getpgid(getpid()));
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+		signal(SIGTSTP, SIG_DFL);
+		signal(SIGTTIN, SIG_DFL);
+		signal(SIGTTOU, SIG_DFL);
 		execvp(object->name, object->args);
 		fprintf(stderr, "%s: %s.\n", SHELL_NAME, strerror(errno));
 		exit(0);
 	}
-	waitpid(child, NULL, 0);
+	waitid(P_PID, child, NULL, WEXITED | WSTOPPED);
+	tcsetpgrp(STDIN_FILENO, getpgid(getpid()));
 }
 
 void add_arg(struct command *object, char *arg)

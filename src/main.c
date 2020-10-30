@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdio_ext.h>
 #include "built_in_cmd.h"
@@ -48,6 +49,13 @@ void batch_mode(char *file_path)
 
 int main(int argc, char **argv)
 {
+	// Ignore signals
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
+	signal(SIGTTIN, SIG_IGN);
+	signal(SIGTTOU, SIG_IGN);
+	// Determine which mode to use
 	switch (argc - 1)
 	{
 		case 0:
