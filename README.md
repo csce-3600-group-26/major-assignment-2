@@ -13,7 +13,8 @@
 | ```exit``` | Richard Lin |
 | ```path``` | Ha Nguyen |
 | ```myhistory``` | Brandon Dumas |
-| I/O Redirection |  |
+| Input Redirection |  |
+| Output Redirection |  |
 | Pipelining |  |
 | Signal Handling and Terminal Control | Richard Lin |
 | ```alias``` | Richard Lin |
