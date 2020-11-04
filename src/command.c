@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -110,6 +111,9 @@ void print_command(struct command *object, int spaces)
 	}
 }
 
+// The read end of the pipe between the previous command and the current command.
+static int fd_read_end = -1;
+
 void execute_command(struct command *object)
 {
 	if (!strcmp(object->name, "exit"))
@@ -189,6 +193,9 @@ void execute_command(struct command *object)
 				previous_aliases_clear();
 				return;
 			}
+	// The read end fd[0] and write end fd[1] of the pipe between the current command and the next command.
+	int fd[2];
+	pipe(fd);
 	// The process ID of the child process.
 	pid_t child = fork();
 	if (!child)
@@ -200,12 +207,48 @@ void execute_command(struct command *object)
 		signal(SIGTSTP, SIG_DFL);
 		signal(SIGTTIN, SIG_DFL);
 		signal(SIGTTOU, SIG_DFL);
+		if (object->input)
+		{
+			// Input Redirection
+		}
+		else if (fd_read_end != -1)
+		{
+			// Input Pipelining
+		}
+		if (object->output)
+		{
+			// Output Redirection
+		}
+		else if (object->pipe)
+		{
+			// Output Pipelining
+		}
+		// Close the read end and write end in the child process.
+		if (fd_read_end != -1)
+			close(fd_read_end);
+		close(fd[0]);
+		close(fd[1]);
 		execvp(object->name, object->args);
 		fprintf(stderr, "%s: %s.\n", SHELL_NAME, strerror(errno));
 		exit(0);
 	}
+	// Close the read end and write end in the parent process.
+	if (fd_read_end != -1)
+		close(fd_read_end);
+	close(fd[1]);
+	// Store the read end for the next command to use.
+	fd_read_end = fd[0];
+	if (object->pipe)
+	{
+		execute_command(object->pipe);
+		return;
+	}
+	if (fd_read_end != -1)
+		close(fd_read_end);
 	waitid(P_PID, child, NULL, WEXITED | WSTOPPED);
 	tcsetpgrp(STDIN_FILENO, getpgid(getpid()));
+	// Reset the read end.
+	fd_read_end = -1;
 }
 
 void add_arg(struct command *object, char *arg)
