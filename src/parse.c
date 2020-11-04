@@ -191,6 +191,7 @@ static int PIPE(char *input, size_t *i, struct command *cmd)
 			{
 				cmd->pipe = new_command();
 				cmd->pipe->name = substring(input, i[0], i[0] + match.rm_eo);
+				add_arg(cmd->pipe, strdup(cmd->pipe->name));
 				i[0] += match.rm_eo;
 				return EXT_ARGS(input, i, cmd->pipe);
 			}
