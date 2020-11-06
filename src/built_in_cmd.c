@@ -8,7 +8,7 @@ void init_data_structures()
 	// path
 
 	// myhistory
-	history = malloc(20*sizeof(struct command *));
+	history = malloc(20*sizeof(char *));
 	history[0] = NULL;
 	history[1] = NULL;
 	history[2] = NULL;

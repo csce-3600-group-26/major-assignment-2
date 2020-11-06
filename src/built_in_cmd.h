@@ -22,14 +22,14 @@ void path(struct command *cmd);
 // Lists or executes previous commands.
 void myhistory(struct command *cmd);
 
-// A null-terminated array of command objects.
-struct command **history;
+// An array of strings that contains recent lines of input.
+char **history;
 
-// The number of command objects in history.
+// The number of strings in history.
 size_t history_size;
 
-// Adds a command object to history.
-void history_add(struct command *cmd);
+// Adds a string to history.
+void history_add(char *entry);
 
 /* -----------------alias---------------- */
 

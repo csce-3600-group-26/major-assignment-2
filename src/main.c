@@ -1,6 +1,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdio_ext.h>
+#include <string.h>
 #include "built_in_cmd.h"
 #include "macros.h"
 #include "parse.h"
@@ -20,6 +21,8 @@ void interactive_mode()
 		// Parse input
 		struct statement *statement = parse(input);
 		execute_statement(statement);
+		// Add input to history
+		history_add(strdup(input));
 	}
 }
 
@@ -44,6 +47,8 @@ void batch_mode(char *file_path)
 		// Parse input
 		struct statement *statement = parse(input);
 		execute_statement(statement);
+		// Add input to history
+		history_add(strdup(input));
 	}
 }
 
