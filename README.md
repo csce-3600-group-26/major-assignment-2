@@ -15,7 +15,7 @@
 | ```myhistory``` | Brandon Dumas |
 | Input Redirection |  |
 | Output Redirection |  |
-| Pipelining |  |
+| Pipelining | Ha Nguyen |
 | Signal Handling and Terminal Control | Richard Lin |
 | ```alias``` | Richard Lin |
 
