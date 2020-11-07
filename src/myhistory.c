@@ -29,8 +29,8 @@ void myhistory(struct command *cmd)
 	//if num = 3 arg2 = -e, and arg3 is a number 1-20 parse history[arg3-1] and pass to execute statement
 	else if((cmd->num_args == 3) && !(strcmp(cmd->args[1],"-e")))
 	{
-	    int num = stoi(cmd->args[2]);
-	    struct *statement stmt = parse(history[num]);
+	    int num = atoi(cmd->args[2]);
+	    struct statement* stmt = parse(history[num]);
 	    execute_statement(stmt);
 	    delete_statement(stmt);
 	}
