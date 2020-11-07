@@ -13,7 +13,7 @@ void myhistory(struct command *cmd)
 	{
 	    for(int i = history_size - 1; i >=0; i--)
 	    {
-	        printf("%s\n",history[i]);
+	        printf("%d: %s\n", i,history[i]);
 	    }
 	}
 	//if num args =2 and arg2 = -c clear history
