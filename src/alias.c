@@ -95,7 +95,7 @@ void alias_clear()
 
 void alias_print()
 {
-	printf("[%lu alias%s]\n", aliases_size, aliases_size == 1 ? "" : "es");
+	printf("[%zu alias%s]\n", aliases_size, aliases_size == 1 ? "" : "es");
 	for (size_t i = 0; aliases[i]; i++)
 		printf("alias %s='%s'\n", aliases[i]->name, aliases[i]->command);
 }
