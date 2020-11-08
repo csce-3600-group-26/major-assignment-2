@@ -30,16 +30,20 @@ void myhistory(struct command *cmd)
 	else if((cmd->num_args == 3) && !(strcmp(cmd->args[1],"-e")))
 	{
 	    int num = atoi(cmd->args[2])+1;
+	    struct statement* stmt = parse(history[num]);
 	    if((num < 0) || (num >= history_size))
 	    {
-	        printf("input is outside of acceptable range");
+	        printf("input is outside of acceptable range\n");
+	    }
+	    else if(stmt->first->args[2] == num)
+	    {
+	        printf("Error: that would cause a Segmentation Fault\n");
 	    }
 	    else
 	    {
-	        struct statement* stmt = parse(history[num]);
 	        execute_statement(stmt);
-	        delete_statement(stmt);
 	    }
+	    delete_statement(stmt);
 	}
 }
 
