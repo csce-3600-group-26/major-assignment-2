@@ -39,7 +39,7 @@ void myhistory(struct command *cmd)
 	    {
 	        if(atoi(stmt->first->args[2]) == num-1)
     	        printf("Error: that would cause a Segmentation Fault\n");
-	    }*/
+	    }
 	    else
 	    {
 	        execute_statement(stmt);
