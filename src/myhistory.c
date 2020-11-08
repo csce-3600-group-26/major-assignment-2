@@ -31,7 +31,7 @@ void myhistory(struct command *cmd)
 	{
 	    int num = atoi(cmd->args[2])+1;
 	    struct statement* stmt = parse(history[num]);
-	    if((num < 0) || (num >= history_size-1))
+	    if((num < 1) || (num >= history_size))
 	    {
 	        printf("input is outside of acceptable range\n");
 	    }
