@@ -35,7 +35,7 @@ void myhistory(struct command *cmd)
 	    {
 	        printf("input is outside of acceptable range\n");
 	    }
-	    else if(stmt->first->args[2] == num)
+	    else if(atoi(stmt->first->args[2]) == num)
 	    {
 	        printf("Error: that would cause a Segmentation Fault\n");
 	    }
