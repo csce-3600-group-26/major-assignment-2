@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include "macros.h"
 #include "parse.h"
 #include "string_util.h"
 
@@ -21,6 +24,27 @@ static int EXT_ARGS(char *, size_t *, struct command *);
 static int PIPE(char *, size_t *, struct command *);
 
 // Definitions
+
+static void print_syntax_error(char *input, size_t *i, char *error_message)
+{
+	fprintf(stderr, "%s: [Syntax Error] %s\n", SHELL_NAME, error_message);
+	struct winsize window_size;
+	ioctl(STDERR_FILENO, TIOCGWINSZ, &window_size);
+	size_t input_length = strlen(input);
+	for (size_t j = 0; j < input_length; j += window_size.ws_col)
+	{
+		size_t end_of_line = j + window_size.ws_col;
+		char *line = substring(input, j, end_of_line < input_length ? end_of_line : input_length);
+		fprintf(stderr, "%s", line);
+		if (i[0] >= j && i[0] < end_of_line)
+		{
+			if (!strchr(line, '\n'))
+				fprintf(stderr, "\n");
+			fprintf(stderr, "%*s^\n", (int) (i[0] - j), "");
+		}
+		free(line);
+	}
+}
 
 static int STATEMENT(char *input, size_t *i, struct statement *statement)
 {
@@ -43,7 +67,7 @@ static int STATEMENT(char *input, size_t *i, struct statement *statement)
 	}
 	else
 	{
-		printf("[Syntax Error] Expecting semicolon or newline.\n");
+		print_syntax_error(input, i, "Expecting semicolon or newline.");
 		i[0] = strlen(input);
 		return 1;
 	}
@@ -82,7 +106,7 @@ static int COMMAND(char *input, size_t *i, struct statement *statement)
 	}
 	else
 	{
-		printf("[Syntax Error] Expecting command.\n");
+		print_syntax_error(input, i, "Expecting command.");
 		i[0] = strlen(input);
 		return 2;
 	}
@@ -102,7 +126,7 @@ static int ARGS(char *input, size_t *i, struct command *cmd)
 		}
 		else
 		{
-			printf("[Syntax Error] Expecting argument for built-in command.\n");
+			print_syntax_error(input, i, "Expecting argument for built-in command.");
 			i[0] = strlen(input);
 			return 3;
 		}
@@ -161,14 +185,14 @@ static int EXT_ARGS(char *input, size_t *i, struct command *cmd)
 				}
 				else
 				{
-					printf("[Syntax Error] Expecting file for redirection.\n");
+					print_syntax_error(input, i, "Expecting file for redirection.");
 					i[0] = strlen(input);
 					return 5;
 				}
 			}
 			else
 			{
-				printf("[Syntax Error] Expecting whitespace.\n");
+				print_syntax_error(input, i, "Expecting whitespace after redirection symbol.");
 				i[0] = strlen(input);
 				return 4;
 			}
@@ -197,14 +221,14 @@ static int PIPE(char *input, size_t *i, struct command *cmd)
 			}
 			else
 			{
-				printf("[Syntax Error] Expecting external command for pipe.\n");
+				print_syntax_error(input, i, "Expecting external command for pipe.");
 				i[0] = strlen(input);
 				return 7;
 			}
 		}
 		else
 		{
-			printf("[Syntax Error] Expecting whitespace.\n");
+			print_syntax_error(input, i, "Expecting whitespace after pipe symbol.");
 			i[0] = strlen(input);
 			return 6;
 		}
