@@ -211,6 +211,12 @@ static int PIPE(char *input, size_t *i, struct command *cmd)
 		if (!regexec(&regex_whitespace, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 		{
 			i[0] += match.rm_eo;
+			if (!regexec(&regex_external_negative_lookahead, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
+			{
+				print_syntax_error(input, i, "Cannot pipe external command to built-in command.");
+				i[0] = strlen(input);
+				return 8;
+			}
 			if (!regexec(&regex_external, &input[i[0]], 1, &match, 0) && match.rm_so == 0)
 			{
 				cmd->pipe = new_command();
@@ -245,6 +251,7 @@ void compile_regex()
 	regcomp(&regex_external,
 			"^((~|\\.|\\.\\.)\\/?|\\/)?[A-Za-z0-9_][\\.A-Za-z0-9_-]*(\\/[A-Za-z0-9_][\\.A-Za-z0-9_-]*)*",
 			REG_EXTENDED);
+	regcomp(&regex_external_negative_lookahead, "^(cd|exit|path|myhistory|alias)([\t ]+|[;\n]|$)", REG_EXTENDED);
 	regcomp(&regex_argument, "[^\t ;\n<>|'\"\\]+", REG_EXTENDED);
 	regcomp(&regex_redirection, "[<>]", REG_EXTENDED);
 	regcomp(&regex_file_path,
@@ -261,6 +268,7 @@ void free_regex()
 	regfree(&regex_alias_cmd);
 	regfree(&regex_alias);
 	regfree(&regex_external);
+	regfree(&regex_external_negative_lookahead);
 	regfree(&regex_argument);
 	regfree(&regex_redirection);
 	regfree(&regex_file_path);
