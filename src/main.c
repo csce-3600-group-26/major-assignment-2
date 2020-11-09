@@ -18,11 +18,11 @@ void interactive_mode()
 		fgets(input, MAX_COMMAND_LENGTH, stdin);
 		// Clear input buffer
 		__fpurge(stdin);
+		// Add input to history
+		history_add(strdup(input));
 		// Parse input
 		struct statement *statement = parse(input);
 		execute_statement(statement);
-		// Add input to history
-		history_add(strdup(input));
 	}
 }
 
@@ -44,11 +44,11 @@ void batch_mode(char *file_path)
 		// Clear line
 		if (input[MAX_COMMAND_LENGTH - 2] != '\n' && input[MAX_COMMAND_LENGTH - 3] != '\n')
 			while (fgetc(file) != '\n');
+		// Add input to history
+		history_add(strdup(input));
 		// Parse input
 		struct statement *statement = parse(input);
 		execute_statement(statement);
-		// Add input to history
-		history_add(strdup(input));
 	}
 }
 
