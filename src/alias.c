@@ -9,8 +9,6 @@
 
 void alias(struct command *cmd)
 {
-	printf("This is the alias command.\n");
-	print_command(cmd, 0);
 	if (cmd->num_args == 1)
 	{
 		alias_print();
