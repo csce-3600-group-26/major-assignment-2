@@ -31,6 +31,9 @@ static void print_syntax_error(char *input, size_t *i, char *error_message)
 	struct winsize window_size;
 	ioctl(STDERR_FILENO, TIOCGWINSZ, &window_size);
 	size_t input_length = strlen(input);
+	for (size_t j = 0; j < input_length; j++)
+		if (input[j] == '\t')
+			input[j] = ' ';
 	for (size_t j = 0; j < input_length; j += window_size.ws_col)
 	{
 		size_t end_of_line = j + window_size.ws_col;
