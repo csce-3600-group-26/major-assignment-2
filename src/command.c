@@ -229,7 +229,7 @@ void execute_command(struct command *object)
 		close(fd[0]);
 		close(fd[1]);
 		execvp(object->name, object->args);
-		fprintf(stderr, "%s: %s.\n", SHELL_NAME, strerror(errno));
+		fprintf(stderr, SGR_RED_FG "%s: %s.\n" SGR_RESET, SHELL_NAME, strerror(errno));
 		exit(0);
 	}
 	// Close the read end and write end in the parent process.

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "built_in_cmd.h"
+#include "macros.h"
 #include "parse.h"
 #include "string_util.h"
 
@@ -40,7 +41,7 @@ void alias(struct command *cmd)
 			return;
 		}
 	}
-	fprintf(stderr, "alias: Invalid arguments.\n");
+	fprintf(stderr, SGR_RED_FG "alias: Invalid arguments.\n" SGR_RESET);
 }
 
 void alias_add(struct alias *alias)
@@ -69,7 +70,7 @@ void alias_remove(char *alias_name)
 			break;
 	if (!aliases[i])
 	{
-		fprintf(stderr, "alias: The alias cannot be removed because it does not exist.\n");
+		fprintf(stderr, SGR_RED_FG "alias: The alias cannot be removed because it does not exist.\n" SGR_RESET);
 		return;
 	}
 	aliases_size--;

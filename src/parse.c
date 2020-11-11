@@ -27,7 +27,7 @@ static int PIPE(char *, size_t *, struct command *);
 
 static void print_syntax_error(char *input, size_t *i, char *error_message)
 {
-	fprintf(stderr, "%s: [Syntax Error] %s\n", SHELL_NAME, error_message);
+	fprintf(stderr,SGR_RED_FG "%s: [Syntax Error] %s\n" SGR_RESET, SHELL_NAME, error_message);
 	struct winsize window_size;
 	ioctl(STDERR_FILENO, TIOCGWINSZ, &window_size);
 	size_t input_length = strlen(input);

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "built_in_cmd.h"
+#include "macros.h"
 #include "parse.h"
 #include "statement.h"
 
@@ -33,12 +34,12 @@ void myhistory(struct command *cmd)
 	    struct statement* stmt = parse(history[num]);
 	    if((num < 1) || (num >= history_size))
 	    {
-	        printf("input is outside of acceptable range\n");
+			fprintf(stderr, SGR_RED_FG "input is outside of acceptable range\n" SGR_RESET);
 	    }
 	    else if(stmt->first->num_args >=3 && stmt->first->args[2] != NULL)
 	    {
 	        if(atoi(stmt->first->args[2]) == num-1)
-    	        printf("Error: that would cause a Segmentation Fault\n");
+				fprintf(stderr, SGR_RED_FG "Error: that would cause a Segmentation Fault\n" SGR_RESET);
 	    }
 	    else
 	    {

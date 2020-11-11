@@ -13,7 +13,7 @@ void interactive_mode()
 	while (1)
 	{
 		// Display prompt
-		printf("prompt> ");
+		printf(SGR_CYAN_FG "prompt> " SGR_RESET);
 		// Read input
 		fgets(input, MAX_COMMAND_LENGTH, stdin);
 		// Clear input buffer
@@ -33,7 +33,7 @@ void batch_mode(char *file_path)
 	FILE *file = fopen(file_path, "r");
 	if (file == NULL)
 	{
-		fprintf(stderr, "%s: The batch file does not exist or cannot be opened.\n", SHELL_NAME);
+		fprintf(stderr, SGR_RED_FG "%s: The batch file does not exist or cannot be opened.\n" SGR_RESET, SHELL_NAME);
 		return;
 	}
 	// Read input
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 			break;
 		default:
 			fprintf(stderr,
-					"%s: Incorrect number of arguments. Pass 0 arguments for interactive mode or 1 argument for batch mode.\n",
+					SGR_RED_FG "%s: Incorrect number of arguments. Pass 0 arguments for interactive mode or 1 argument for batch mode.\n" SGR_RESET,
 					SHELL_NAME);
 			break;
 	}
