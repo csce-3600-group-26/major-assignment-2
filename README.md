@@ -25,7 +25,7 @@
 ### ```cd```
 Write about how you implemented the ```cd``` command.
 ### ```exit```
-Write about how you implemented the ```exit``` command.
+The ```exit``` command terminates the shell by calling ```exit()```.
 ### ```path```
 Write about how you implemented the ```path``` command.
 ### ```myhistory```
