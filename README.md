@@ -1,5 +1,9 @@
 # Major Assignment 2
-
+To run the program:
+```
+make
+./newshell
+```
 # Team Members
 - Brandon Dumas
 - Richard Lin
