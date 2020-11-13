@@ -6,6 +6,7 @@
 #include "built_in_cmd.h"
 #include "macros.h"
 #include "parse.h"
+#include "statement.h"
 #include "string_util.h"
 
 void alias(struct command *cmd)
@@ -29,7 +30,12 @@ void alias(struct command *cmd)
 			size_t index_of_assignment_operator = strchr(cmd->args[1], '=') - cmd->args[1];
 			alias->name = substring(cmd->args[1], 0, index_of_assignment_operator);
 			alias->command = substring(cmd->args[1], index_of_assignment_operator + 2, strlen(cmd->args[1]) - 1);
-			alias_add(alias);
+			struct statement *statement = parse(alias->command);
+			if (statement)
+				alias_add(alias);
+			else
+				delete_alias(alias);
+			delete_statement(statement);
 			return;
 		}
 	}
