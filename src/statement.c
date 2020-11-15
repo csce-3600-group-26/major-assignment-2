@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "built_in_cmd.h"
 #include "command.h"
 #include "statement.h"
 
@@ -37,6 +38,7 @@ void execute_statement(struct statement *object)
 {
 	if (object)
 	{
+		alias_expand(object);
 		if (object->first)
 			execute_command(object->first);
 		execute_statement(object->next);

@@ -22,7 +22,10 @@ void interactive_mode()
 		history_add(strdup(input));
 		// Parse input
 		struct statement *statement = parse(input);
+		// Execute statement
 		execute_statement(statement);
+		// Delete statement
+		delete_statement(statement);
 	}
 }
 
@@ -48,7 +51,10 @@ void batch_mode(char *file_path)
 		history_add(strdup(input));
 		// Parse input
 		struct statement *statement = parse(input);
+		// Execute statement
 		execute_statement(statement);
+		// Delete statement
+		delete_statement(statement);
 	}
 }
 

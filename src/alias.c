@@ -119,3 +119,105 @@ void delete_alias(struct alias *object)
 	free(object->command);
 	free(object);
 }
+
+// An array of strings, each representing an alias that has already been expanded.
+static char **previous_aliases = NULL;
+
+// The number of aliases in previous_aliases.
+static size_t previous_aliases_size = 0;
+
+// Adds an alias to previous_aliases.
+static void previous_aliases_add(char *alias)
+{
+	if (previous_aliases)
+	{
+		previous_aliases_size++;
+		char **new_previous_aliases = malloc(sizeof(char *) * (previous_aliases_size + 1));
+		new_previous_aliases[previous_aliases_size] = NULL;
+		new_previous_aliases[previous_aliases_size - 1] = alias;
+		memcpy(new_previous_aliases, previous_aliases, sizeof(char *) * (previous_aliases_size - 1));
+		free(previous_aliases);
+		previous_aliases = new_previous_aliases;
+	}
+	else
+	{
+		previous_aliases_size = 1;
+		previous_aliases = malloc(sizeof(char *) * 2);
+		previous_aliases[1] = NULL;
+		previous_aliases[0] = alias;
+	}
+}
+
+// Removes all aliases in previous_aliases.
+static void previous_aliases_clear()
+{
+	if (previous_aliases)
+	{
+		previous_aliases_size = 0;
+		free(previous_aliases);
+		previous_aliases = NULL;
+	}
+}
+
+// Returns a pointer to the matching alias. Returns NULL if the alias has already been expanded of if it is not found.
+static struct alias *previous_aliases_find(char *alias)
+{
+	if (previous_aliases)
+		for (size_t i = 0; previous_aliases[i]; i++)
+			if (!strcmp(alias, previous_aliases[i]))
+				return NULL;
+	for (size_t i = 0; aliases[i]; i++)
+		if (!strcmp(alias, aliases[i]->name))
+			return aliases[i];
+	return NULL;
+}
+
+void alias_expand(struct statement *statement)
+{
+	if (statement)
+		for (struct command *current_command = statement->first, *previous_command = NULL;
+			 current_command;
+			 previous_command = current_command, current_command = current_command->pipe)
+		{
+			while (1)
+			{
+				struct alias *alias = previous_aliases_find(current_command->name);
+				if (!alias)
+					break;
+				// Keep track of aliases that have already been expanded.
+				previous_aliases_add(alias->name);
+				// Parse the alias.
+				struct statement *alias_statement = parse(alias->command);
+				struct command *alias_command = alias_statement->first;
+				alias_statement->first = NULL;
+				delete_statement(alias_statement);
+				// Copy all arguments from the current command to the alias's command.
+				for (size_t j = 1; j < current_command->num_args; j++)
+					add_arg(alias_command, strdup(current_command->args[j]));
+				if (current_command->input)
+				{
+					free(alias_command->input);
+					alias_command->input = strdup(current_command->input);
+				}
+				if (current_command->output)
+				{
+					free(alias_command->output);
+					alias_command->output = strdup(current_command->output);
+				}
+				if (current_command->pipe)
+				{
+					alias_command->pipe = current_command->pipe;
+					current_command->pipe = NULL;
+				}
+				// Connect the alias's command to the previous command.
+				if (previous_command)
+					previous_command->pipe = alias_command;
+				else
+					statement->first = alias_command;
+				// Set the current command to the alias's command.
+				delete_command(current_command);
+				current_command = alias_command;
+			}
+			previous_aliases_clear();
+		}
+}

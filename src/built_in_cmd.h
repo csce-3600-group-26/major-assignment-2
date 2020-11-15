@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "command.h"
+#include "statement.h"
 
 /* ------------------cd------------------ */
 
@@ -68,6 +69,10 @@ void alias_clear();
 
 // Prints all aliases.
 void alias_print();
+
+// Expands all aliases in a statement. Modifies a statement object by finding an alias that matches a command and
+// expanding that alias.
+void alias_expand(struct statement *statement);
 
 /* -------------------------------------- */
 
