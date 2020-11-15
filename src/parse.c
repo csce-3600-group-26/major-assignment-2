@@ -250,7 +250,7 @@ void compile_regex()
 	regcomp(&regex_whitespace, "[\t ]+", REG_EXTENDED);
 	regcomp(&regex_built_in, "cd|exit|path|myhistory", REG_EXTENDED);
 	regcomp(&regex_alias_cmd, "alias", REG_EXTENDED);
-	regcomp(&regex_alias, "[A-Za-z_][A-Za-z0-9_]*='[^']*'", REG_EXTENDED);
+	regcomp(&regex_alias, "[A-Za-z_][A-Za-z0-9_]*='[^'|;]*'", REG_EXTENDED);
 	regcomp(&regex_external,
 			"^((~|\\.|\\.\\.)\\/?|\\/)?[A-Za-z0-9_][\\.A-Za-z0-9_-]*(\\/[A-Za-z0-9_][\\.A-Za-z0-9_-]*)*",
 			REG_EXTENDED);
