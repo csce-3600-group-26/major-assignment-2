@@ -32,7 +32,15 @@ void alias(struct command *cmd)
 			alias->command = substring(cmd->args[1], index_of_assignment_operator + 2, strlen(cmd->args[1]) - 1);
 			struct statement *statement = parse(alias->command);
 			if (statement)
-				alias_add(alias);
+			{
+				if (statement->first)
+					alias_add(alias);
+				else
+				{
+					fprintf(stderr, SGR_RED_FG "alias: The alias cannot be added because it is empty.\n" SGR_RESET);
+					delete_alias(alias);
+				}
+			}
 			else
 				delete_alias(alias);
 			delete_statement(statement);
