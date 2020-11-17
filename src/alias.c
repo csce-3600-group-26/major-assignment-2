@@ -199,22 +199,26 @@ void alias_expand(struct statement *statement)
 				struct command *alias_command = alias_statement->first;
 				alias_statement->first = NULL;
 				delete_statement(alias_statement);
-				// Copy all arguments from the current command to the alias's command.
+				// Get the last command.
+				struct command *last_command = alias_command;
+				while (last_command->pipe)
+					last_command = last_command->pipe;
+				// Copy all arguments from the current command to the alias's last command.
 				for (size_t j = 1; j < current_command->num_args; j++)
-					add_arg(alias_command, strdup(current_command->args[j]));
+					add_arg(last_command, strdup(current_command->args[j]));
 				if (current_command->input)
 				{
-					free(alias_command->input);
-					alias_command->input = strdup(current_command->input);
+					free(last_command->input);
+					last_command->input = strdup(current_command->input);
 				}
 				if (current_command->output)
 				{
-					free(alias_command->output);
-					alias_command->output = strdup(current_command->output);
+					free(last_command->output);
+					last_command->output = strdup(current_command->output);
 				}
 				if (current_command->pipe)
 				{
-					alias_command->pipe = current_command->pipe;
+					last_command->pipe = current_command->pipe;
 					current_command->pipe = NULL;
 				}
 				// Connect the alias's command to the previous command.
