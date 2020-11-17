@@ -64,44 +64,20 @@ void print_command(struct command *object, int spaces)
 // The read end of the pipe between the previous command and the current command.
 static int fd_read_end = -1;
 
-void execute_command(struct command *object)
+// The number of commands in the pipeline.
+static int pipeline_size = 0;
+
+// Executes an external command.
+static void execute_external_command(struct command *object)
 {
-	if (!strcmp(object->name, "exit"))
-		exit(0);
-	if (!strcmp(object->name, "cd"))
-	{
-		cd(object);
-		return;
-	}
-	else if (!strcmp(object->name, "path"))
-	{
-		path(object);
-		return;
-	}
-	else if (!strcmp(object->name, "myhistory"))
-	{
-		myhistory(object);
-		return;
-	}
-	else if (!strcmp(object->name, "alias"))
-	{
-		alias(object);
-		return;
-	}
 	// The read end fd[0] and write end fd[1] of the pipe between the current command and the next command.
 	int fd[2];
 	pipe(fd);
+	pipeline_size++;
 	// The process ID of the child process.
 	pid_t child = fork();
 	if (!child)
 	{
-		setpgid(getpid(), 0);
-		tcsetpgrp(STDIN_FILENO, getpgid(getpid()));
-		signal(SIGINT, SIG_DFL);
-		signal(SIGQUIT, SIG_DFL);
-		signal(SIGTSTP, SIG_DFL);
-		signal(SIGTTIN, SIG_DFL);
-		signal(SIGTTOU, SIG_DFL);
 		if (object->input)
 		{
 			// Input Redirection
@@ -135,15 +111,55 @@ void execute_command(struct command *object)
 	fd_read_end = fd[0];
 	if (object->pipe)
 	{
-		execute_command(object->pipe);
+		execute_external_command(object->pipe);
 		return;
 	}
 	if (fd_read_end != -1)
 		close(fd_read_end);
-	waitid(P_PID, child, NULL, WEXITED | WSTOPPED);
+	for (int i = 0; i < pipeline_size; i++)
+		waitpid(-1, NULL, WUNTRACED);
+}
+
+void execute_command(struct command *object)
+{
+	if (!strcmp(object->name, "exit"))
+		exit(0);
+	if (!strcmp(object->name, "cd"))
+	{
+		cd(object);
+		return;
+	}
+	else if (!strcmp(object->name, "path"))
+	{
+		path(object);
+		return;
+	}
+	else if (!strcmp(object->name, "myhistory"))
+	{
+		myhistory(object);
+		return;
+	}
+	else if (!strcmp(object->name, "alias"))
+	{
+		alias(object);
+		return;
+	}
+	// The process ID of the child process.
+	pid_t child = fork();
+	if (!child)
+	{
+		setpgid(getpid(), 0);
+		tcsetpgrp(STDIN_FILENO, getpgid(getpid()));
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+		signal(SIGTSTP, SIG_DFL);
+		signal(SIGTTIN, SIG_DFL);
+		signal(SIGTTOU, SIG_DFL);
+		execute_external_command(object);
+		exit(0);
+	}
+	waitpid(child, NULL, WUNTRACED);
 	tcsetpgrp(STDIN_FILENO, getpgid(getpid()));
-	// Reset the read end.
-	fd_read_end = -1;
 }
 
 void add_arg(struct command *object, char *arg)
