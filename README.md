@@ -41,7 +41,7 @@ Write about how you implemented Output Redirection.
 ### Pipelining
 Write about how you implemented Pipelining.
 ### Signal Handling and Terminal Control
-Write about how you implemented Signal Handling and Terminal Control.
+The shell ignores the following signals: SIGINT, SIGQUIT, SIGTSTP, SIGTTIN, SIGTTOU. When a command is executed, after ```fork()``` is called, the ignored signals will be reset to their default actions for the child process. Additionally, all commands in the same pipeline will share the same process group ID and be placed in the foreground upon execution.
 ### ```alias```
 The ```alias``` command uses a null-terminated array to store aliases. Each alias is an instance of ```struct alias```. ```struct alias``` contains 2 member variables which are strings. One string contains the alias's name and the other string contains a command that can be parsed and executed by the shell. An instance of ```struct alias``` can be created by calling ```new_alias()``` and be deleted by calling ```delete_alias()```.
 
