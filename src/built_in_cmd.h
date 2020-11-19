@@ -20,7 +20,7 @@ void path(struct command *cmd);
 
 /* ---------------myhistory-------------- */
 
-// Lists or executes previous commands.
+// Lists or executes recent lines of input.
 void myhistory(struct command *cmd);
 
 // An array of strings that contains recent lines of input.

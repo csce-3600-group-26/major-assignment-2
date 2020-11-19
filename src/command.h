@@ -7,7 +7,7 @@ struct command
 {
 	// The name of the command.
 	char *name;
-	// A pointer to an array of command-line arguments.
+	// A null-terminated array of strings, each storing a command-line argument.
 	char **args;
 	// The number of command-line arguments.
 	size_t num_args;
