@@ -127,12 +127,6 @@ static int ARGS(char *input, size_t *i, struct command *cmd)
 			i[0] += match.rm_eo;
 			return ARGS(input, i, cmd);
 		}
-		else
-		{
-			print_syntax_error(input, i, "Expecting argument for built-in command.");
-			i[0] = strlen(input);
-			return 3;
-		}
 	}
 	return 0;
 }
