@@ -31,21 +31,26 @@ void myhistory(struct command *cmd)
 	else if((cmd->num_args == 3) && !(strcmp(cmd->args[1],"-e")))
 	{
 	    int num = atoi(cmd->args[2])+1;
-	    struct statement* stmt = parse(history[num]);
 	    if((num < 1) || (num >= history_size))
 	    {
 			fprintf(stderr, SGR_RED_FG "input is outside of acceptable range\n" SGR_RESET);
 	    }
-	    else if(stmt->first->num_args >=3 && stmt->first->args[2] != NULL)
-	    {
-	        if(atoi(stmt->first->args[2]) == num-1)
-				fprintf(stderr, SGR_RED_FG "Error: that would cause a Segmentation Fault\n" SGR_RESET);
-	    }
 	    else
-	    {
-	        execute_statement(stmt);
-	    }
-	    delete_statement(stmt);
+		{
+			struct statement* stmt = parse(history[num]);
+			if (!stmt)
+				return;
+			if(stmt->first->num_args >=3 && stmt->first->args[2] != NULL)
+			{
+				if(atoi(stmt->first->args[2]) == num-1)
+					fprintf(stderr, SGR_RED_FG "Error: that would cause a Segmentation Fault\n" SGR_RESET);
+			}
+			else
+			{
+				execute_statement(stmt);
+			}
+			delete_statement(stmt);
+		}
 	}
 }
 
