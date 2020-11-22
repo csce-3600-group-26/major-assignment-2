@@ -85,6 +85,7 @@ static void execute_external_command(struct command *object)
 		else if (fd_read_end != -1)
 		{
 			// Input Pipelining
+			dup2(fd_read_end, 0);
 		}
 		if (object->output)
 		{
@@ -93,6 +94,7 @@ static void execute_external_command(struct command *object)
 		else if (object->pipe)
 		{
 			// Output Pipelining
+			dup2(fd[1],1);
 		}
 		// Close the read end and write end in the child process.
 		if (fd_read_end != -1)
