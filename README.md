@@ -83,7 +83,10 @@ Write about how you implemented the ```cd``` command.
 ### ```exit```
 The ```exit``` command terminates the shell by calling ```exit()```.
 ### ```path```
-Write about how you implemented the ```path``` command.
+The ```path``` command allows user to show the current pathname list, append one pathname, or remove one path name. ```struct path``` will first check the number of argument user input. 
+If the argument contains only one ```path```string, it will searches for the enviroment string pointed to by ```PATH`` and print out the associated current path. If the argument contains three strings, the function will continue to check the second argument string whether the sign "+" or "-" exits by funtion compare ```strcmp()```. 
+If the 2nd argument contain the string "+", ```strcat``` will concatenates the original path string and the new pathnames string separated by colons. Then the setenv() function adds the path variable to the environment with the new path value (path_1), if the path does not already exist.  If the path does exist in the environment, its direction is changed to the path_1.
+if the 2nd argument contains the string "-", print error if there is no file found. Or print new path after removing the path user entered.
 ### ```myhistory```
 Write about how you implemented the ```myhistory``` command.
 ### Input Redirection
@@ -91,7 +94,7 @@ Write about how you implemented Input Redirection.
 ### Output Redirection
 Write about how you implemented Output Redirection.
 ### Pipelining
-Write about how you implemented Pipelining.
+Duplicate read end of cat->grep pipe to stdin (of grep) in input pipelining. Duplicate write end of grep->cut pipe to stdout (of grep) in output pipelining.   
 ### Signal Handling and Terminal Control
 The shell ignores the following signals: SIGINT, SIGQUIT, SIGTSTP, SIGTTIN, SIGTTOU. When a command is executed, after ```fork()``` is called, the ignored signals will be reset to their default actions for the child process. Additionally, all commands in the same pipeline will share the same process group ID and be placed in the foreground upon execution.
 ### ```alias```
