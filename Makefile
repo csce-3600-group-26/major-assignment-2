@@ -1,11 +1,14 @@
-newshell : main.o command.o parse.o statement.o string_util.o built_in_cmd.o cd.o path.o myhistory.o alias.o
-	gcc -o newshell main.o command.o parse.o statement.o string_util.o built_in_cmd.o cd.o path.o myhistory.o alias.o
+newshell : main.o command.o mode.o parse.o statement.o string_util.o built_in_cmd.o cd.o path.o myhistory.o alias.o
+	gcc -o newshell main.o command.o mode.o parse.o statement.o string_util.o built_in_cmd.o cd.o path.o myhistory.o alias.o
 
 main.o : src/main.c
 	gcc -c src/main.c -Wall
 
 command.o : src/command.c
 	gcc -c src/command.c -Wall
+
+mode.o : src/mode.c
+	gcc -c src/mode.c -Wall
 
 parse.o : src/parse.c
 	gcc -c src/parse.c -Wall
@@ -34,4 +37,4 @@ alias.o : src/alias.c
 .PHONY : clean
 
 clean :
-	rm newshell main.o command.o parse.o statement.o string_util.o built_in_cmd.o cd.o path.o myhistory.o alias.o
+	rm newshell main.o command.o mode.o parse.o statement.o string_util.o built_in_cmd.o cd.o path.o myhistory.o alias.o
