@@ -10,7 +10,7 @@ void cd(struct command *cmd)
 {
 	//printf("This is the cd command.\n");
 	
-	char *pth;
+	char *pth = (cmd->num_args == 1) ? getenv("HOME") : cmd->args[1];
 	char path[MAX_COMMAND_LENGTH];
 	strcpy(path,pth);
 	char cwd[MAX_COMMAND_LENGTH];
