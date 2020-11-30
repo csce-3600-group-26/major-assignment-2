@@ -1,5 +1,7 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdio_ext.h>
+#include <string.h>
 #include "built_in_cmd.h"
 #include "macros.h"
 #include "parse.h"
@@ -11,14 +13,19 @@ void interactive_mode()
 	while (1)
 	{
 		// Display prompt
-		printf("prompt> ");
+		printf(SGR_CYAN_FG "prompt> " SGR_RESET);
 		// Read input
 		fgets(input, MAX_COMMAND_LENGTH, stdin);
 		// Clear input buffer
 		__fpurge(stdin);
+		// Add input to history
+		history_add(strdup(input));
 		// Parse input
 		struct statement *statement = parse(input);
+		// Execute statement
 		execute_statement(statement);
+		// Delete statement
+		delete_statement(statement);
 	}
 }
 
@@ -29,7 +36,7 @@ void batch_mode(char *file_path)
 	FILE *file = fopen(file_path, "r");
 	if (file == NULL)
 	{
-		fprintf(stderr, "%s: The batch file does not exist or cannot be opened.\n", SHELL_NAME);
+		fprintf(stderr, SGR_RED_FG "%s: The batch file does not exist or cannot be opened.\n" SGR_RESET, SHELL_NAME);
 		return;
 	}
 	// Read input
@@ -40,14 +47,26 @@ void batch_mode(char *file_path)
 		// Clear line
 		if (input[MAX_COMMAND_LENGTH - 2] != '\n' && input[MAX_COMMAND_LENGTH - 3] != '\n')
 			while (fgetc(file) != '\n');
+		// Add input to history
+		history_add(strdup(input));
 		// Parse input
 		struct statement *statement = parse(input);
+		// Execute statement
 		execute_statement(statement);
+		// Delete statement
+		delete_statement(statement);
 	}
 }
 
 int main(int argc, char **argv)
 {
+	// Ignore signals
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
+	signal(SIGTTIN, SIG_IGN);
+	signal(SIGTTOU, SIG_IGN);
+	// Determine which mode to use
 	switch (argc - 1)
 	{
 		case 0:
@@ -62,7 +81,7 @@ int main(int argc, char **argv)
 			break;
 		default:
 			fprintf(stderr,
-					"%s: Incorrect number of arguments. Pass 0 arguments for interactive mode or 1 argument for batch mode.\n",
+					SGR_RED_FG "%s: Incorrect number of arguments. Pass 0 arguments for interactive mode or 1 argument for batch mode.\n" SGR_RESET,
 					SHELL_NAME);
 			break;
 	}

@@ -1,15 +1,15 @@
 #include <errno.h>
+#include <fcntl.h>
+#include <signal.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include "built_in_cmd.h"
 #include "command.h"
 #include "macros.h"
-#include "parse.h"
 
 struct command *new_command()
 {
@@ -22,6 +22,21 @@ struct command *new_command()
 	object->output = NULL;
 	object->pipe = NULL;
 	return object;
+}
+
+void delete_command(struct command *object)
+{
+	if (object)
+	{
+		free(object->name);
+		for (size_t i = 0; object->args[i]; i++)
+			free(object->args[i]);
+		free(object->args);
+		free(object->input);
+		free(object->output);
+		delete_command(object->pipe);
+		free(object);
+	}
 }
 
 void print_command(struct command *object, int spaces)
@@ -44,6 +59,67 @@ void print_command(struct command *object, int spaces)
 		printf("%*sPipe:\n", spaces, "");
 		print_command(object->pipe, spaces + 1);
 	}
+}
+
+// The read end of the pipe between the previous command and the current command.
+static int fd_read_end = -1;
+
+// The number of commands in the pipeline.
+static int pipeline_size = 0;
+
+// Executes an external command.
+static void execute_external_command(struct command *object)
+{
+	// The read end fd[0] and write end fd[1] of the pipe between the current command and the next command.
+	int fd[2];
+	pipe(fd);
+	pipeline_size++;
+	// The process ID of the child process.
+	pid_t child = fork();
+	if (!child)
+	{
+		if (object->input)
+		{
+			// Input Redirection
+		}
+		else if (fd_read_end != -1)
+		{
+			// Input Pipelining
+			dup2(fd_read_end, 0);
+		}
+		if (object->output)
+		{
+			// Output Redirection
+		}
+		else if (object->pipe)
+		{
+			// Output Pipelining
+			dup2(fd[1],1);
+		}
+		// Close the read end and write end in the child process.
+		if (fd_read_end != -1)
+			close(fd_read_end);
+		close(fd[0]);
+		close(fd[1]);
+		execvp(object->name, object->args);
+		fprintf(stderr, SGR_RED_FG "%s: %s.\n" SGR_RESET, SHELL_NAME, strerror(errno));
+		exit(0);
+	}
+	// Close the read end and write end in the parent process.
+	if (fd_read_end != -1)
+		close(fd_read_end);
+	close(fd[1]);
+	// Store the read end for the next command to use.
+	fd_read_end = fd[0];
+	if (object->pipe)
+	{
+		execute_external_command(object->pipe);
+		return;
+	}
+	if (fd_read_end != -1)
+		close(fd_read_end);
+	for (int i = 0; i < pipeline_size; i++)
+		waitpid(-1, NULL, WUNTRACED);
 }
 
 void execute_command(struct command *object)
@@ -70,22 +146,22 @@ void execute_command(struct command *object)
 		alias(object);
 		return;
 	}
-	// Find a matching alias and execute it.
-	for (size_t i = 0; aliases[i]; i++)
-		if (!strcmp(object->name, aliases[i]->name))
-		{
-			execute_statement(parse(aliases[i]->command));
-			return;
-		}
 	// The process ID of the child process.
 	pid_t child = fork();
 	if (!child)
 	{
-		execvp(object->name, object->args);
-		fprintf(stderr, "%s: %s\n", SHELL_NAME, strerror(errno));
+		setpgid(getpid(), 0);
+		tcsetpgrp(STDIN_FILENO, getpgid(getpid()));
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+		signal(SIGTSTP, SIG_DFL);
+		signal(SIGTTIN, SIG_DFL);
+		signal(SIGTTOU, SIG_DFL);
+		execute_external_command(object);
 		exit(0);
 	}
-	waitpid(child, NULL, 0);
+	waitpid(child, NULL, WUNTRACED);
+	tcsetpgrp(STDIN_FILENO, getpgid(getpid()));
 }
 
 void add_arg(struct command *object, char *arg)

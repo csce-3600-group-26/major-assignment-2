@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "command.h"
+#include "statement.h"
 
 /* ------------------cd------------------ */
 
@@ -19,17 +20,17 @@ void path(struct command *cmd);
 
 /* ---------------myhistory-------------- */
 
-// Lists or executes previous commands.
+// Lists or executes recent lines of input.
 void myhistory(struct command *cmd);
 
-// A null-terminated array of command objects.
-struct command **history;
+// An array of strings that contains recent lines of input.
+char **history;
 
-// The number of command objects in history.
+// The number of strings in history.
 size_t history_size;
 
-// Adds a command object to history.
-void history_add(struct command *cmd);
+// Adds a string to history.
+void history_add(char *entry);
 
 /* -----------------alias---------------- */
 
@@ -44,6 +45,12 @@ struct alias
 	// The command to execute when the name is called.
 	char *command;
 };
+
+// Instantiates an alias object.
+struct alias *new_alias();
+
+// Frees the memory associated with an alias object and its members.
+void delete_alias(struct alias *object);
 
 // A null-terminated array of alias objects.
 struct alias **aliases;
@@ -62,6 +69,10 @@ void alias_clear();
 
 // Prints all aliases.
 void alias_print();
+
+// Expands all aliases in a statement. Modifies a statement object by finding an alias that matches a command and
+// expanding that alias.
+void alias_expand(struct statement *statement);
 
 /* -------------------------------------- */
 

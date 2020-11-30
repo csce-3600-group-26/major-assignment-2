@@ -7,7 +7,7 @@ struct command
 {
 	// The name of the command.
 	char *name;
-	// A pointer to an array of command-line arguments.
+	// A null-terminated array of strings, each storing a command-line argument.
 	char **args;
 	// The number of command-line arguments.
 	size_t num_args;
@@ -23,7 +23,7 @@ struct command
 struct command *new_command();
 
 // Frees the memory associated with a command object and its members.
-void delete_command(struct command *);
+void delete_command(struct command *object);
 
 // Prints a command object in a human-readable format.
 void print_command(struct command *object, int spaces);
