@@ -92,10 +92,9 @@ static void execute_external_command(struct command *object)
 		if (object->output)
 		{
 			// Output Redirection
-			fd[1] = open(output, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
-			dup2(fd[1], STDOUT_FILENO);
-			close(fd[1]);
-			object->output = 1; 
+			int fd_output = open(object->output, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
+			dup2(fd_output, STDOUT_FILENO);
+			close(fd_output);
 		}
 		else if (object->pipe)
 		{
