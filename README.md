@@ -84,7 +84,7 @@ Write about how you implemented the ```cd``` command.
 The ```exit``` command terminates the shell by calling ```exit()```.
 ### ```path```
 The ```path``` command allows user to show the current pathname list, append one pathname, or remove one path name. ```struct path``` will first check the number of argument user input. 
-If the argument contains only one ```path```string, it will searches for the enviroment string pointed to by ```PATH`` and print out the associated current path. If the argument contains three strings, the function will continue to check the second argument string whether the sign "+" or "-" exits by funtion compare ```strcmp()```. 
+If the argument contains only one ```path```string, it will searches for the enviroment string pointed to by ```PATH``` and print out the associated current path. If the argument contains three strings, the function will continue to check the second argument string whether the sign "+" or "-" exits by funtion compare ```strcmp()```. 
 If the 2nd argument contain the string "+", ```strcat``` will concatenates the original path string and the new pathnames string separated by colons. Then the setenv() function adds the path variable to the environment with the new path value (path_1), if the path does not already exist.  If the path does exist in the environment, its direction is changed to the path_1.
 if the 2nd argument contains the string "-", print error if there is no file found. Or print new path after removing the path user entered.
 ### ```myhistory```
