@@ -80,10 +80,9 @@ static void execute_external_command(struct command *object)
 	{
 		if (object->input)
 		{
-			fd[0] = open(input, O_RDONLY, 0);
-			dup2(fd[0], STDIN_FILENO);
-			close(fd[0]);
-			object->input = 0;
+			int fd_input = open(object->input, O_RDONLY, 0);
+			dup2(fd_input, STDIN_FILENO);
+			close(fd_input);
 		}
 		else if (fd_read_end != -1)
 		{
