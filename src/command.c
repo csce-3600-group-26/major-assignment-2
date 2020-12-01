@@ -10,6 +10,7 @@
 #include "built_in_cmd.h"
 #include "command.h"
 #include "macros.h"
+#include "mode.h"
 
 struct command *new_command()
 {
@@ -155,6 +156,8 @@ void execute_command(struct command *object)
 	pid_t child = fork();
 	if (!child)
 	{
+		if (batch_file)
+			fclose(batch_file);
 		setpgid(getpid(), 0);
 		tcsetpgrp(STDIN_FILENO, getpgid(getpid()));
 		signal(SIGINT, SIG_DFL);
